@@ -1,0 +1,121 @@
+================================================================================
+                          TIMER SHOLAT APP
+                     Spesifikasi Aplikasi Flutter
+================================================================================
+
+APP NAME: Timer Sholat App
+
+DESKRIPSI:
+  Aplikasi untuk menampilkan waktu sholat harian, countdown menuju sholat
+  berikutnya, serta notifikasi pengingat.
+
+================================================================================
+FITUR UTAMA
+================================================================================
+
+  1. Menampilkan waktu sholat (Subuh, Dzuhur, Ashar, Maghrib, Isya)
+  2. Countdown ke waktu sholat berikutnya
+  3. Notifikasi adzan / pengingat
+  4. Penentuan lokasi otomatis (GPS) atau manual
+  5. Mode offline (menggunakan perhitungan lokal)
+  6. Tema terang/gelap
+
+================================================================================
+STRUKTUR FOLDER (FLUTTER)
+================================================================================
+
+  lib/
+  │
+  ├── main.dart
+  ├── screens/
+  │   ├── home_screen.dart
+  │   ├── settings_screen.dart
+  │
+  ├── widgets/
+  │   ├── prayer_card.dart
+  │   ├── countdown_timer.dart
+  │
+  ├── services/
+  │   ├── prayer_time_service.dart
+  │   ├── notification_service.dart
+  │   ├── location_service.dart
+  │
+  ├── models/
+  │   ├── prayer_time_model.dart
+  │
+  └── utils/
+      ├── constants.dart
+      ├── helpers.dart
+
+================================================================================
+FLOW APLIKASI
+================================================================================
+
+  1. App dibuka
+  2. Ambil lokasi pengguna
+  3. Hitung waktu sholat berdasarkan lokasi
+  4. Tampilkan daftar waktu sholat hari ini
+  5. Hitung waktu terdekat → tampilkan countdown
+  6. Jadwalkan notifikasi sebelum waktu sholat
+
+================================================================================
+ALGORITMA SEDERHANA
+================================================================================
+
+  Input  : Latitude, Longitude
+  Proses : Gunakan API atau library (misal: adhan)
+  Output : Jadwal sholat harian
+  Logic  : Bandingkan waktu sekarang dengan jadwal → tentukan next prayer
+
+================================================================================
+UI DESIGN
+================================================================================
+
+  HOME SCREEN:
+  ┌─────────────────────────────────┐
+  │  [Nama Kota]     [Tanggal]      │  ← Header
+  ├─────────────────────────────────┤
+  │  ┌───────┐ ┌───────┐ ┌───────┐ │
+  │  │ Subuh │ │Dzuhur │ │ Ashar │ │  ← Cards Waktu Sholat
+  │  └───────┘ └───────┘ └───────┘ │
+  │  ┌───────────┐ ┌─────────────┐ │
+  │  │  Maghrib  │ │    Isya     │ │
+  │  └───────────┘ └─────────────┘ │
+  ├─────────────────────────────────┤
+  │                                 │
+  │       ⏱ COUNTDOWN BESAR        │  ← Countdown ke sholat berikutnya
+  │         00 : 45 : 32            │
+  │                                 │
+  ├─────────────────────────────────┤
+  │          [⚙ Pengaturan]         │  ← Tombol settings
+  └─────────────────────────────────┘
+
+  SETTINGS SCREEN:
+  ┌─────────────────────────────────┐
+  │  Metode Perhitungan             │  ← Pilih metode (MUI, ISNA, dll)
+  │  Notifikasi        [ON/OFF]     │  ← Aktif/nonaktif notifikasi
+  │  Lokasi Manual                  │  ← Input kota/koordinat manual
+  └─────────────────────────────────┘
+
+================================================================================
+DEPENDENCIES (FLUTTER)
+================================================================================
+
+  dependencies:
+    geolocator                  # Akses GPS / lokasi pengguna
+    adhan / prayer_times        # Perhitungan waktu sholat
+    flutter_local_notifications # Notifikasi lokal
+    intl                        # Format tanggal & waktu
+
+================================================================================
+PENGEMBANGAN LANJUT
+================================================================================
+
+  - Tambah suara adzan
+  - Widget di homescreen
+  - Integrasi kalender Hijriyah
+  - Kompas arah kiblat
+
+================================================================================
+                            END OF FILE
+================================================================================
