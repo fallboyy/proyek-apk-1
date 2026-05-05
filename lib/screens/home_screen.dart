@@ -9,6 +9,7 @@ import '../utils/helpers.dart';
 import '../widgets/prayer_card.dart';
 import '../widgets/countdown_timer.dart';
 import 'settings_screen.dart';
+import '../main.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,6 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
+      // Sinkronisasikan tema dengan setting yang baru
+      themeNotifier.value = PreferencesService.isDarkMode ? ThemeMode.dark : ThemeMode.light;
+
       LocationResult location;
 
       // 1. Dapatkan lokasi (manual atau otomatis)
