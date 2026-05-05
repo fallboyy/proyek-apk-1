@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
@@ -9,6 +10,8 @@ class NotificationService {
 
   /// Inisialisasi pengaturan notifikasi untuk Android dan iOS
   static Future<void> init() async {
+    if (kIsWeb) return; // Notifikasi lokal tidak disupport di Web secara native
+
     // 1. Inisialisasi timezone (wajib untuk zonedSchedule)
     tz_data.initializeTimeZones();
 
@@ -42,6 +45,8 @@ class NotificationService {
 
   /// Meminta izin notifikasi (terutama untuk Android 13+)
   static Future<void> requestPermissions() async {
+    if (kIsWeb) return; // Skip untuk Web
+
     // Android
     await _notificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -66,6 +71,8 @@ class NotificationService {
 
   /// Menjadwalkan semua notifikasi waktu sholat untuk hari ini
   static Future<void> schedulePrayerNotifications(PrayerTimeModel model) async {
+    if (kIsWeb) return; // Skip untuk Web
+
     // 1. Batalkan semua notifikasi lama supaya tidak dobel
     await cancelAllNotifications();
 
@@ -135,6 +142,7 @@ class NotificationService {
 
   /// Membatalkan semua notifikasi
   static Future<void> cancelAllNotifications() async {
+    if (kIsWeb) return; // Skip untuk Web
     await _notificationsPlugin.cancelAll();
   }
 }
