@@ -1,8 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 import '../models/prayer_time_model.dart';
-import '../utils/helpers.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -11,7 +10,7 @@ class NotificationService {
   /// Inisialisasi pengaturan notifikasi untuk Android dan iOS
   static Future<void> init() async {
     // 1. Inisialisasi timezone (wajib untuk zonedSchedule)
-    tz.initializeTimeZones();
+    tz_data.initializeTimeZones();
 
     // 2. Setting untuk Android
     // '@mipmap/ic_launcher' menggunakan icon aplikasi bawaan sebagai icon notifikasi
