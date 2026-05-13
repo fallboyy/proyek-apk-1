@@ -44,7 +44,7 @@ class TimerSholatApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeNotifier,
-      builder: (_, ThemeMode currentMode, __) {
+      builder: (context, ThemeMode currentMode, child) {
         return MaterialApp(
           title: 'Timer Sholat',
           debugShowCheckedModeBanner: false,

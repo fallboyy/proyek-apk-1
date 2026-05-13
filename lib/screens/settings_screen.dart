@@ -104,7 +104,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             title: const Text('Mode Gelap'),
             value: _isDarkMode,
-            activeColor: AppColors.primaryGreen,
+            activeThumbColor: AppColors.primaryGreen,
             onChanged: (val) {
               setState(() => _isDarkMode = val);
               _markAsChanged();
@@ -122,7 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('Notifikasi Adzan'),
             subtitle: const Text('Tampilkan notifikasi saat waktu sholat tiba'),
             value: _isNotificationEnabled,
-            activeColor: AppColors.primaryGreen,
+            activeThumbColor: AppColors.primaryGreen,
             onChanged: (val) {
               setState(() => _isNotificationEnabled = val);
               _markAsChanged();
@@ -142,7 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               labelText: 'Metode Perhitungan',
               border: OutlineInputBorder(),
             ),
-            value: _calculationMethod,
+            initialValue: _calculationMethod,
             isExpanded: true,
             items: CalculationMethodHelper.labels.entries.map((e) {
               return DropdownMenuItem(value: e.key, child: Text(e.value));
@@ -160,7 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               labelText: 'Madzhab (Mempengaruhi Waktu Ashar)',
               border: OutlineInputBorder(),
             ),
-            value: _madhab,
+            initialValue: _madhab,
             items: MadhabHelper.labels.entries.map((e) {
               return DropdownMenuItem(value: e.key, child: Text(e.value));
             }).toList(),
@@ -183,7 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('Gunakan Lokasi Manual'),
             subtitle: const Text('Matikan untuk menggunakan GPS otomatis'),
             value: _useManualLocation,
-            activeColor: AppColors.primaryGreen,
+            activeThumbColor: AppColors.primaryGreen,
             onChanged: (val) {
               setState(() => _useManualLocation = val);
               _markAsChanged();

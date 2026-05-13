@@ -92,7 +92,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
         borderRadius: BorderRadius.circular(24.0),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGreen.withOpacity(0.3),
+            color: AppColors.primaryGreen.withValues(alpha: 0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -122,7 +122,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
           Text(
             'Pukul ${formatTime(widget.targetTime!)}',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontSize: 14,
             ),
           ),

@@ -21,9 +21,9 @@ class PrayerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // Gunakan warna accent untuk card sholat berikutnya
     final backgroundColor = isNext
-        ? AppColors.primaryGreen.withOpacity(0.15)
+        ? AppColors.primaryGreen.withValues(alpha: 0.15)
         : (isCurrent
-            ? AppColors.teal.withOpacity(0.05)
+            ? AppColors.teal.withValues(alpha: 0.05)
             : Theme.of(context).cardColor);
 
     final borderColor = isNext
@@ -38,7 +38,7 @@ class PrayerCard extends StatelessWidget {
         border: Border.all(color: borderColor, width: isNext ? 1.5 : 1.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
