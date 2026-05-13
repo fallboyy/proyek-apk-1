@@ -110,8 +110,7 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
       playSound: true,
-      // Jika Anda punya custom sound adzan, bisa di set di sini nanti
-      // sound: RawResourceAndroidNotificationSound('adzan_sound'),
+      sound: RawResourceAndroidNotificationSound('adzan_sound'),
     );
 
     // Detail untuk iOS
