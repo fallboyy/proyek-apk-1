@@ -90,6 +90,11 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         actions: [
           IconButton(
+            icon: const Icon(Icons.my_location),
+            tooltip: 'Perbarui Lokasi GPS Terkini',
+            onPressed: _loadData,
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () async {
               // Pindah ke halaman setting dan tunggu jika ada perubahan

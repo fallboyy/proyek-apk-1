@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../utils/constants.dart';
@@ -23,10 +24,12 @@ class LocationService {
       LocationPermission permission;
 
       // 1. Cek apakah service GPS (Location Services) di device aktif
-      serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        // Jika tidak aktif, gunakan fallback (Jakarta)
-        return _getDefaultLocation();
+      if (!kIsWeb) {
+        serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          // Jika tidak aktif, gunakan fallback (Jakarta)
+          return _getDefaultLocation();
+        }
       }
 
       // 2. Cek permission dari user
@@ -95,9 +98,9 @@ class LocationService {
           return city;
         }
       }
-      return AppDefaults.defaultCityName;
+      return 'Lokasi Anda'; // Jika gagal mendapat nama kota (misal di Web)
     } catch (e) {
-      return AppDefaults.defaultCityName;
+      return 'Lokasi Anda'; // Jika gagal (misal di Web)
     }
   }
 
