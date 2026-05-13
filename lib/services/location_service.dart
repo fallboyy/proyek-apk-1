@@ -50,8 +50,10 @@ class LocationService {
 
       // 3. Ambil koordinat posisi saat ini (GPS)
       Position position = await Geolocator.getCurrentPosition(
-        // ignore: deprecated_member_use
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
       );
 
       // 4. Ubah koordinat menjadi nama kota (Reverse Geocoding)

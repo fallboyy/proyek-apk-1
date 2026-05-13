@@ -75,8 +75,9 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
       });
     } catch (e) {
+      debugPrint('Error _loadData: $e');
       setState(() {
-        _errorMessage = 'Gagal memuat jadwal sholat.\nPastikan GPS atau koneksi internet Anda aktif.';
+        _errorMessage = 'Gagal memuat jadwal sholat.\nPastikan GPS atau koneksi internet Anda aktif.\n\nDetail: $e';
         _isLoading = false;
       });
     }
