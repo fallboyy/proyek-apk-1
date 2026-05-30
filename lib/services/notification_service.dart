@@ -1,8 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:alarm/alarm.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 import '../models/prayer_time_model.dart';
+import '../utils/constants.dart';
+import 'preferences_service.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -47,16 +51,27 @@ class NotificationService {
   static Future<void> requestPermissions() async {
     if (kIsWeb) return; // Skip untuk Web
 
-    // Android
+    // Android 13+ Notifications
     await _notificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
         
+    // Android 12+ Exact Alarms
     await _notificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.requestExactAlarmsPermission();
+
+    // Minta izin System Alert Window (Muncul di atas aplikasi lain)
+    if (!await Permission.systemAlertWindow.isGranted) {
+      await Permission.systemAlertWindow.request();
+    }
+
+    // Minta izin abaikan optimasi baterai (agar tidak dimatikan paksa)
+    if (!await Permission.ignoreBatteryOptimizations.isGranted) {
+      await Permission.ignoreBatteryOptimizations.request();
+    }
 
     // iOS
     await _notificationsPlugin
@@ -73,11 +88,19 @@ class NotificationService {
   static Future<void> schedulePrayerNotifications(PrayerTimeModel model) async {
     if (kIsWeb) return; // Skip untuk Web
 
-    // 1. Batalkan semua notifikasi lama supaya tidak dobel
-    await cancelAllNotifications();
+    // 1. Batalkan semua notifikasi visual lama
+    await _notificationsPlugin.cancelAll();
+    
+    // 1b. Batalkan alarm terjadwal yang BELUM berbunyi (jangan stop yang sedang ringing)
+    final scheduledAlarms = await Alarm.getAlarms();
+    for (final alarm in scheduledAlarms) {
+      if (!await Alarm.isRinging(alarm.id)) {
+        await Alarm.stop(alarm.id);
+      }
+    }
 
     final now = DateTime.now();
-    int idCounter = 0; // ID unik untuk setiap notifikasi
+    int idCounter = 1; // ID unik untuk setiap notifikasi (alarm package tidak menerima id 0)
 
     // 2. Loop semua waktu sholat (Subuh, Dzuhur, dll)
     for (final type in PrayerType.values) {
@@ -103,14 +126,18 @@ class NotificationService {
     required DateTime scheduledTime,
   }) async {
     // Detail untuk Android
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'prayer_time_channel', // ID channel
-      'Pengingat Waktu Sholat', // Nama channel
-      channelDescription: 'Notifikasi saat waktu sholat tiba',
+    // PENTING: Channel ID harus baru jika sebelumnya sudah pernah terinstal
+    // karena Android meng-cache settings channel (termasuk sound)
+    AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      'adzan_channel_v6', // ID channel baru (v6) untuk silent notification visual
+      'Adzan Waktu Sholat',
+      channelDescription: 'Menampilkan notifikasi saat waktu sholat tiba',
       importance: Importance.max,
       priority: Priority.high,
-      playSound: true,
-      sound: RawResourceAndroidNotificationSound('adzan_sound'),
+      playSound: false, // MATIKAN sound karena akan ditangani oleh package alarm
+      enableVibration: false, // MATIKAN vibration karena ditangani alarm
+      fullScreenIntent: true,
+      category: AndroidNotificationCategory.alarm,
     );
 
     // Detail untuk iOS
@@ -121,12 +148,12 @@ class NotificationService {
       // sound: 'adzan_sound.wav',
     );
 
-    const NotificationDetails platformDetails = NotificationDetails(
+    NotificationDetails platformDetails = NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );
 
-    // Jadwalkan dengan format waktu spesifik zona waktu lokal
+    // Jadwalkan dengan format waktu spesifik zona waktu lokal (Visual Pop-up)
     await _notificationsPlugin.zonedSchedule(
       id,
       title,
@@ -137,11 +164,43 @@ class NotificationService {
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );
+
+    // Jadwalkan suara dengan package Alarm (Background Audio / WakeLock)
+    final alarmSettings = AlarmSettings(
+      id: id,
+      dateTime: scheduledTime,
+      assetAudioPath: AdzanAudioHelper.getPath(PreferencesService.adzanAudio),
+      loopAudio: false,
+      vibrate: true,
+      volume: 1.0,
+      fadeDuration: 0.0,
+      notificationSettings: NotificationSettings(
+        title: title,
+        body: body,
+        stopButton: 'Matikan',
+      ),
+    );
+    await Alarm.set(alarmSettings: alarmSettings);
   }
 
-  /// Membatalkan semua notifikasi
+  /// Membatalkan semua notifikasi dan alarm (termasuk yang sedang berbunyi)
   static Future<void> cancelAllNotifications() async {
     if (kIsWeb) return; // Skip untuk Web
     await _notificationsPlugin.cancelAll();
+    
+    // Stop semua alarm yang terjadwal tapi BELUM berbunyi
+    final scheduledAlarms = await Alarm.getAlarms();
+    for (final alarm in scheduledAlarms) {
+      if (!await Alarm.isRinging(alarm.id)) {
+        await Alarm.stop(alarm.id);
+      }
+    }
+  }
+
+  /// Membatalkan SEMUA alarm termasuk yang sedang berbunyi (dipakai saat Master Switch OFF)
+  static Future<void> cancelEverything() async {
+    if (kIsWeb) return;
+    await _notificationsPlugin.cancelAll();
+    await Alarm.stopAll();
   }
 }

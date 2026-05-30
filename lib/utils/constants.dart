@@ -64,9 +64,9 @@ class AppDefaults {
   static const double defaultLongitude = 106.8456;
   static const String defaultCityName = 'Jakarta';
 
-  /// Default metode perhitungan: Kemenag / MUI (menggunakan method muslim_world_league
-  /// karena paling mendekati metode Kemenag Indonesia)
-  static const String defaultCalculationMethod = 'muslim_world_league';
+  /// Default metode perhitungan: Singapore / Kemenag Indonesia
+  /// (Parameter sudut Subuh 20° dan Isya 18° sama persis dengan Kemenag RI)
+  static const String defaultCalculationMethod = 'singapore';
 
   /// Default madhab
   static const String defaultMadhab = 'shafi';
@@ -76,6 +76,12 @@ class AppDefaults {
 
   /// Dark mode default aktif
   static const bool defaultDarkMode = true;
+
+  /// Aplikasi aktif secara default
+  static const bool defaultAppActive = true;
+
+  /// Default audio adzan
+  static const String defaultAdzanAudio = 'adzan_sound';
 }
 
 /// ============================================================
@@ -107,7 +113,7 @@ class CalculationMethodHelper {
     'dubai': 'Dubai',
     'qatar': 'Qatar',
     'kuwait': 'Kuwait',
-    'singapore': 'Singapore',
+    'singapore': 'Kemenag Indonesia / Singapore',
     'north_america': 'ISNA (North America)',
     'turkey': 'Diyanet İşleri Başkanlığı (Turkey)',
     'tehran': 'Institute of Geophysics, Tehran',
@@ -149,6 +155,34 @@ class MadhabHelper {
 }
 
 /// ============================================================
+/// PILIHAN AUDIO ADZAN
+/// ============================================================
+
+class AdzanAudioHelper {
+  /// Map key → path asset audio
+  static final Map<String, String> audioPaths = {
+    'adzan_sound': 'assets/audio/adzan_sound.mp3',
+    'adzan_kurdi': 'assets/audio/adzan_kurdi.mp3',
+  };
+
+  /// Label user-friendly untuk setiap audio
+  static final Map<String, String> labels = {
+    'adzan_sound': 'Adzan Daeng Syawal (Original)',
+    'adzan_kurdi': 'Adzan Kurdi Merdu',
+  };
+
+  /// Ambil path dari key
+  static String getPath(String key) {
+    return audioPaths[key] ?? audioPaths['adzan_sound']!;
+  }
+
+  /// Ambil label dari key
+  static String getLabel(String key) {
+    return labels[key] ?? 'Adzan Daeng Syawal (Original)';
+  }
+}
+
+/// ============================================================
 /// SHARED PREFERENCES KEYS
 /// ============================================================
 
@@ -161,4 +195,6 @@ class PrefKeys {
   static const String manualLongitude = 'manual_longitude';
   static const String manualCityName = 'manual_city_name';
   static const String useManualLocation = 'use_manual_location';
+  static const String appActive = 'app_active';
+  static const String adzanAudio = 'adzan_audio';
 }

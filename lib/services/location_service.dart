@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../utils/constants.dart';
+import '../services/preferences_service.dart';
 
 /// Class pembantu untuk mengembalikan hasil lokasi
 class LocationResult {
@@ -62,6 +63,11 @@ class LocationService {
         position.longitude,
       );
 
+      // 5. Simpan ke memori sebagai lokasi terakhir (GPS 1x)
+      await PreferencesService.setLastLatitude(position.latitude);
+      await PreferencesService.setLastLongitude(position.longitude);
+      await PreferencesService.setLastCityName(city);
+
       return LocationResult(
         latitude: position.latitude,
         longitude: position.longitude,
@@ -106,8 +112,21 @@ class LocationService {
     }
   }
 
-  /// Helper untuk mengembalikan lokasi default (berdasarkan constants)
+  /// Helper untuk mengembalikan lokasi default
+  /// Prioritas: Lokasi terakhir yang tersimpan -> Lokasi default (Jakarta)
   static LocationResult _getDefaultLocation() {
+    final lastLat = PreferencesService.lastLatitude;
+    final lastLng = PreferencesService.lastLongitude;
+    final lastCity = PreferencesService.lastCityName;
+
+    if (lastLat != null && lastLng != null && lastCity != null) {
+      return LocationResult(
+        latitude: lastLat,
+        longitude: lastLng,
+        cityName: lastCity,
+      );
+    }
+
     return LocationResult(
       latitude: AppDefaults.defaultLatitude,
       longitude: AppDefaults.defaultLongitude,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:alarm/alarm.dart';
 import '../services/preferences_service.dart';
 import '../utils/constants.dart';
 
@@ -16,6 +17,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late String _calculationMethod;
   late String _madhab;
   late bool _useManualLocation;
+  late String _adzanAudio;
   
   // Controller untuk lokasi manual
   final _latController = TextEditingController();
@@ -34,6 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _calculationMethod = PreferencesService.calculationMethod;
     _madhab = PreferencesService.madhab;
     _useManualLocation = PreferencesService.useManualLocation;
+    _adzanAudio = PreferencesService.adzanAudio;
     
     _latController.text = PreferencesService.manualLatitude.toString();
     _lngController.text = PreferencesService.manualLongitude.toString();
@@ -55,6 +58,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await PreferencesService.setCalculationMethod(_calculationMethod);
     await PreferencesService.setMadhab(_madhab);
     await PreferencesService.setUseManualLocation(_useManualLocation);
+    await PreferencesService.setAdzanAudio(_adzanAudio);
     
     if (_useManualLocation) {
       final lat = double.tryParse(_latController.text) ?? AppDefaults.defaultLatitude;
@@ -126,6 +130,78 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onChanged: (val) {
               setState(() => _isNotificationEnabled = val);
               _markAsChanged();
+            },
+          ),
+
+          const Divider(height: 32),
+
+          // --- KELOMPOK: AUDIO ADZAN ---
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Text('AUDIO ADZAN', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.teal)),
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            decoration: const InputDecoration(
+              labelText: 'Pilih Suara Adzan',
+              border: OutlineInputBorder(),
+            ),
+            value: _adzanAudio,
+            isExpanded: true,
+            items: AdzanAudioHelper.labels.entries.map((e) {
+              return DropdownMenuItem(value: e.key, child: Text(e.value));
+            }).toList(),
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _adzanAudio = val);
+                _markAsChanged();
+              }
+            },
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.play_arrow, color: AppColors.primaryGreen),
+            label: const Text('Dengar Preview'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.primaryGreen,
+              side: const BorderSide(color: AppColors.primaryGreen),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+            onPressed: () async {
+              // Stop semua alarm dulu agar tidak bentrok
+              await Alarm.stopAll();
+              
+              // Tunggu sebentar agar audio engine benar-benar bersih
+              await Future.delayed(const Duration(milliseconds: 500));
+              
+              final previewAlarm = AlarmSettings(
+                id: 998,
+                dateTime: DateTime.now().add(const Duration(seconds: 1)),
+                assetAudioPath: AdzanAudioHelper.getPath(_adzanAudio),
+                loopAudio: false,
+                vibrate: false,
+                volume: 1.0,
+                fadeDuration: 0.0,
+                notificationSettings: const NotificationSettings(
+                  title: 'Preview Adzan',
+                  body: 'Sedang memutar preview...',
+                  stopButton: 'Stop',
+                ),
+              );
+              await Alarm.set(alarmSettings: previewAlarm);
+              
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Memutar: ${AdzanAudioHelper.getLabel(_adzanAudio)}'),
+                  duration: const Duration(seconds: 10),
+                  action: SnackBarAction(
+                    label: 'Stop',
+                    onPressed: () => Alarm.stop(998),
+                  ),
+                ),
+              );
             },
           ),
 

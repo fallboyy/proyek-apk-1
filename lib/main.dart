@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'screens/home_screen.dart';
 import 'services/preferences_service.dart';
 import 'services/notification_service.dart';
+import 'package:alarm/alarm.dart';
 import 'utils/helpers.dart';
 import 'utils/constants.dart';
 
@@ -28,7 +29,10 @@ void main() async {
   // 3. Inisialisasi Lokalisasi (Bahasa Indonesia untuk tanggal, dll)
   await initializeLocale();
 
-  // 4. Minta izin notifikasi dari user (penting untuk Android 13+)
+  // 4. Inisialisasi package Alarm
+  await Alarm.init();
+
+  // 5. Minta izin notifikasi dari user (penting untuk Android 13+)
   await NotificationService.requestPermissions();
 
   // 5. Atur tema awal berdasarkan pengaturan tersimpan

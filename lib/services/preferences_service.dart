@@ -20,6 +20,26 @@ class PreferencesService {
   }
 
   // ============================================================
+  // PENGATURAN STATUS APLIKASI
+  // ============================================================
+  static bool get isAppActive =>
+      _prefs.getBool(PrefKeys.appActive) ?? AppDefaults.defaultAppActive;
+
+  static Future<void> setAppActive(bool value) async {
+    await _prefs.setBool(PrefKeys.appActive, value);
+  }
+
+  // ============================================================
+  // PENGATURAN AUDIO ADZAN
+  // ============================================================
+  static String get adzanAudio =>
+      _prefs.getString(PrefKeys.adzanAudio) ?? AppDefaults.defaultAdzanAudio;
+
+  static Future<void> setAdzanAudio(String value) async {
+    await _prefs.setString(PrefKeys.adzanAudio, value);
+  }
+
+  // ============================================================
   // PENGATURAN NOTIFIKASI
   // ============================================================
   static bool get isNotificationEnabled =>
@@ -78,5 +98,23 @@ class PreferencesService {
 
   static Future<void> setManualCityName(String value) async {
     await _prefs.setString(PrefKeys.manualCityName, value);
+  }
+
+  // ============================================================
+  // PENGATURAN CACHE LOKASI TERAKHIR (GPS 1x)
+  // ============================================================
+  static double? get lastLatitude => _prefs.getDouble('last_lat');
+  static Future<void> setLastLatitude(double value) async {
+    await _prefs.setDouble('last_lat', value);
+  }
+
+  static double? get lastLongitude => _prefs.getDouble('last_lng');
+  static Future<void> setLastLongitude(double value) async {
+    await _prefs.setDouble('last_lng', value);
+  }
+
+  static String? get lastCityName => _prefs.getString('last_city');
+  static Future<void> setLastCityName(String value) async {
+    await _prefs.setString('last_city', value);
   }
 }
